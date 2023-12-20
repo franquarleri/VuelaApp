@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import CalculadoraModal from './CalculadoraModal';
+import CalculatorScreen from './Cuotas';
 
 const Cotizaciones = () => {
   const [data, setData] = useState(null);
@@ -112,16 +113,37 @@ const Cotizaciones = () => {
     }));
   };
 
-  const handleCotizar = (cantidad, tipoOperacion, moneda) => {
-    // Implementa la lógica de cotización aquí según los parámetros proporcionados
-    // Actualiza los estados o realiza las operaciones necesarias
-    // Ejemplo:
-    // setCantidadDinero(cantidad);
-    // setTipoCambio(moneda);
-    // setConversor(tipoOperacion);
-    // calcularValor(); // Puedes llamar a tu función de cálculo aquí si es necesario
+  const handleCotizar = () => {
+    // Realiza la lógica de cotización según tus necesidades
+    const valorMoneda = parseFloat(data?.[moneda]?.compra) || parseFloat(data?.[moneda]?.venta) || 1.0;
+
+    const cantidadNumerica = parseFloat(cantidad);
+  
+    if (isNaN(cantidadNumerica)) {
+      // Manejar caso en el que la cantidad ingresada no es un número válido
+      console.error('La cantidad ingresada no es válida');
+      setResultado('La cantidad ingresada no es válida');
+      return;
+    }
+  
+    let resultadoCalculado = 0;
+  
+    if (tipoOperacion === 'pesosAmoneda') {
+      resultadoCalculado = cantidadNumerica / valorMoneda;
+    } else if (tipoOperacion === 'monedaApesos') {
+      resultadoCalculado = cantidadNumerica * valorMoneda;
+    } else {
+      console.error('Tipo de operación no reconocido');
+      setResultado('Tipo de operación no reconocido');
+      return;
+    }
+  
+    // Reemplaza la línea console.log con la siguiente:
+    setResultado(isNaN(resultadoCalculado) ? "No se puede calcular" : `$${resultadoCalculado.toLocaleString('en-US', { minimumFractionDigits: 2 })}`);
   };
-    
+  
+
+
   // Estilos.
 
   const styles = StyleSheet.create({
@@ -185,7 +207,7 @@ const Cotizaciones = () => {
 return (
   <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.titulo}>
-        <Text style={styles.textoTitulo}>Tasa de Cambio</Text>
+        <Text style={styles.textoTitulo}>Cotizaciones</Text>
       </View>
 
       <View style={styles.cotizaciones}>
@@ -269,7 +291,7 @@ return (
         cotizar={handleCotizar}
       />
 
-      {/* Puedes agregar aquí la lógica del modal según tus necesidades */}
+        <CalculatorScreen />
     
   </ScrollView>
   );  
