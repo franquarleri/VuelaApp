@@ -10,6 +10,7 @@ const Cotizaciones = () => {
   const [conversor, setConversor] = useState('pesosAdolares');
   const [tipoCambio, setTipoCambio] = useState('blue');
   const [fechaActualizacion, setFechaActualizacion] = useState(null);
+  const [resultadoCalculado, setResultadoCalculado] = useState(null);
 
 
   useEffect(() => {
@@ -113,37 +114,7 @@ const Cotizaciones = () => {
     }));
   };
 
-  const handleCotizar = () => {
-    // Realiza la lógica de cotización según tus necesidades
-    const valorMoneda = parseFloat(data?.[moneda]?.compra) || parseFloat(data?.[moneda]?.venta) || 1.0;
-
-    const cantidadNumerica = parseFloat(cantidad);
   
-    if (isNaN(cantidadNumerica)) {
-      // Manejar caso en el que la cantidad ingresada no es un número válido
-      console.error('La cantidad ingresada no es válida');
-      setResultado('La cantidad ingresada no es válida');
-      return;
-    }
-  
-    let resultadoCalculado = 0;
-  
-    if (tipoOperacion === 'pesosAmoneda') {
-      resultadoCalculado = cantidadNumerica / valorMoneda;
-    } else if (tipoOperacion === 'monedaApesos') {
-      resultadoCalculado = cantidadNumerica * valorMoneda;
-    } else {
-      console.error('Tipo de operación no reconocido');
-      setResultado('Tipo de operación no reconocido');
-      return;
-    }
-  
-    // Reemplaza la línea console.log con la siguiente:
-    setResultado(isNaN(resultadoCalculado) ? "No se puede calcular" : `$${resultadoCalculado.toLocaleString('en-US', { minimumFractionDigits: 2 })}`);
-  };
-  
-
-
   // Estilos.
 
   const styles = StyleSheet.create({
@@ -203,6 +174,44 @@ const Cotizaciones = () => {
       color: '#fff',
     },
   });
+
+  const handleCotizar = () => {
+    // Validar la cantidad ingresada
+    const cantidadNumerica = parseFloat(cantidadDinero);
+    if (isNaN(cantidadNumerica)) {
+      console.log('La cantidad ingresada no es un número válido');
+      return;
+    }
+
+    // Validar que la moneda seleccionada exista en el objeto data
+    if (!data || !data.hasOwnProperty(tipoCambio)) {
+      console.log('La moneda seleccionada no existe');
+      return;
+    }
+
+    // Acceder a la información de la moneda seleccionada
+    const valorMoneda = parseFloat(data[tipoCambio]?.compra) || 1.0;
+
+    // Realizar el cálculo
+    let resultadoCalculado = 0;
+
+    if (conversor === 'pesosAdolares') {
+      resultadoCalculado = cantidadNumerica / valorMoneda;
+    } else if (conversor === 'dolaresApesos') {
+      resultadoCalculado = cantidadNumerica * valorMoneda;
+    } else {
+      console.log('Tipo de conversión no reconocido');
+      return;
+    }
+
+    // Actualizar el resultado calculado en el estado
+    setResultadoCalculado(
+      isNaN(resultadoCalculado) ? "No se puede calcular" : `$${resultadoCalculado.toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+    );
+  }
+
+
+
 
 return (
   <ScrollView contentContainerStyle={styles.container}>

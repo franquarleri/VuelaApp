@@ -5,52 +5,48 @@ import { Picker } from '@react-native-picker/picker';
 const CalculadoraModal = ({ visible, closeModal, cotizar, data }) => {
   const [cantidad, setCantidad] = useState('');
   const [tipoOperacion, setTipoOperacion] = useState('pesosAmoneda');
-  const [moneda, setMoneda] = useState('blue');
+  const [tipoCambio, setTipoCambio] = useState('blue');
   const [resultado, setResultado] = useState('');
-
+  const [cotizaciones, setCotizaciones] = useState({});
+ 
   useEffect(() => {
-    if (!visible) {
-      setCantidad('');
-      setTipoOperacion('pesosAmoneda');
-      setMoneda('blue');
-      setResultado('');
-    }
+     if (!visible) {
+       setCantidad('');
+       setTipoOperacion('pesosAmoneda');
+       setTipoCambio('blue');
+       setResultado('');
+     }
   }, [visible]);
-
+ 
+  useEffect(() => {
+     setCotizaciones(data);
+  }, [data]);
+ 
   const handleCotizar = () => {
-    // Restablece el resultado
-    setResultado('');
-
-    // Validar la cantidad ingresada
-    const cantidadNumerica = parseFloat(cantidad);
-    if (isNaN(cantidadNumerica)) {
-      setResultado('La cantidad ingresada no es un número válido');
-      return;
-    }
-
-    // Validar que la moneda seleccionada exista en el objeto data
-    if (!data || !data.hasOwnProperty(moneda)) {
-      setResultado('La moneda seleccionada no existe');
-      return;
-    }
-
-    // Acceder a la información de la moneda seleccionada
-    const valorMoneda = parseFloat(data[moneda]?.compra) || 1.0;
-
-    // Realizar el cálculo
-    let resultadoCalculado = 0;
-
-    if (tipoOperacion === 'pesosAmoneda') {
-      resultadoCalculado = cantidadNumerica / valorMoneda;
-    } else if (tipoOperacion === 'monedaApesos') {
-      resultadoCalculado = cantidadNumerica * valorMoneda;
-    } else {
-      setResultado('Tipo de operación no reconocido');
-      return;
-    }
-
-    // Actualizar el resultado en el estado local
-    setResultado(isNaN(resultadoCalculado) ? "No se puede calcular" : `$${resultadoCalculado.toLocaleString('en-US', { minimumFractionDigits: 2 })}`);
+     console.log('Cotizaciones disponibles:', cotizaciones);
+     
+     // Validar la cantidad ingresada
+     const cantidadNumerica = parseFloat(cantidad);
+     if (isNaN(cantidadNumerica)) {
+       setResultado('La cantidad ingresada no es un número válido');
+       return;
+     }
+ 
+     // Validar que la moneda seleccionada exista en el objeto data
+     if (!cotizaciones || !cotizaciones.hasOwnProperty(tipoCambio)) {
+       setResultado('No se encontró la cotización de la moneda seleccionada');
+       return;
+     }
+ 
+     // Realizar la operación
+     let resultadoCotizacion = 0;
+     if (tipoOperacion === 'pesosAmoneda') {
+       resultadoCotizacion = cantidadNumerica * cotizaciones[tipoCambio];
+     } else {
+       resultadoCotizacion = cantidadNumerica / cotizaciones[tipoCambio];
+     }
+ 
+     setResultado(resultadoCotizacion.toFixed(2));
   };
 
   return (
@@ -85,8 +81,8 @@ const CalculadoraModal = ({ visible, closeModal, cotizar, data }) => {
             <Picker.Item label="Moneda a Pesos" value="monedaApesos" />
           </Picker>
           <Picker
-            selectedValue={moneda}
-            onValueChange={(itemValue) => setMoneda(itemValue)}
+            selectedValue={tipoCambio}
+            onValueChange={(itemValue) => setTipoCambio(itemValue)}
           >
             {/* Agrega aquí las opciones de moneda según las tarjetas que estás mostrando */}
             <Picker.Item label="Dólar Blue" value="blue" />
