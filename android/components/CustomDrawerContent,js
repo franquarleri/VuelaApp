@@ -1,0 +1,44 @@
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { DrawerContentScrollView } from '@react-navigation/drawer';
+
+const CustomDrawerContent = ({ navigation }) => {
+  return (
+    <DrawerContentScrollView>
+      <View style={styles.drawerContent}>
+        <TouchableOpacity
+          style={styles.drawerItem}
+          onPress={() => navigation.navigate('Home')}
+        >
+          <Text>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.drawerItem}
+          onPress={() => navigation.navigate('Profile')}
+        >
+          <Text>Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.drawerItem}
+          onPress={() => navigation.navigate('Settings')}
+        >
+          <Text>Settings</Text>
+        </TouchableOpacity>
+      </View>
+    </DrawerContentScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  drawerContent: {
+    flex: 1,
+    paddingTop: 20,
+  },
+  drawerItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+});
+
+export default CustomDrawerContent;
